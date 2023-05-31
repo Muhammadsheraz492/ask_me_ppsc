@@ -6,6 +6,8 @@ const bodyParser = require("body-parser");
 // locallhost:3000/Signin
 require("dotenv").config();
 const app = express();
+const core = require("cors");
+app.use(core());
 app.use(bodyParser.json());
 mongoose
   .connect(`${process.env.DB}`, {
