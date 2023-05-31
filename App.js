@@ -44,18 +44,7 @@ const core = require("cors");
 const app = express();
 app.use(bodyParser.json());
 app.use(core());
-mongoose
-  .connect(process.env.DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("Connected to MongoDB");
-    // Proceed with your application logic
-  })
-  .catch((error) => {
-    console.error("Error connecting to MongoDB:", error);
-  });
+
 app.use(express.json({ extended: false }));
 
 app.use(morgan("dev"));
