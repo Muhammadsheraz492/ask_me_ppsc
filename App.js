@@ -8,7 +8,7 @@ require("dotenv").config();
 const app = express();
 app.use(bodyParser.json());
 mongoose
-  .connect(process.env.DB.toString(), {
+  .connect(`${process.env.DB}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
