@@ -7,10 +7,12 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const app = express();
 const core = require("cors");
+const morgan = require("morgan");
 app.use(core());
+app.use(morgan("dev"));
 app.use(bodyParser.json());
 mongoose
-  .connect(`${process.env.DB}`, {
+  .connect(process.env.DB, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
