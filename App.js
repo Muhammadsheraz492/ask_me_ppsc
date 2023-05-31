@@ -2,11 +2,13 @@ const express = require("express");
 const { default: mongoose } = require("mongoose");
 const Customer = require("./Customer");
 const Questions = require("./Questions");
+const bodyParser = require("body-parser");
 // locallhost:3000/Signin
+require("dotenv").config();
 const app = express();
-var url = "mongodb://localhost:27017/test";
+app.use(bodyParser.json());
 mongoose
-  .connect(url, {
+  .connect(process.env.DB, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -22,8 +24,8 @@ app.use("/test", (req, res) => {
 
 app.use("/User", Customer);
 app.use("/Admin", Questions);
-app.use("/", (req, res) => {
-  res.end("Server is RUninng");
-});
+// app.use("/", (req, res) => {
+//   res.end("Home is RUninng");
+// });
 
 module.exports = app;
