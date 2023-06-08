@@ -75,6 +75,22 @@ Route.post('/Category', (req, res) => {
         });
     }
 })
+Route.get("/Category",(req,res)=>{
+  Category.find({}).then((doc)=>{
+     res.status(200).json({
+        "status":true,
+        data:doc
+
+     })
+  }).catch((err)=>{
+    res.status(200).json({
+        status: false,
+        message: err
+    });
+  })
+})
+
+
 
 
 module.exports = Route;
