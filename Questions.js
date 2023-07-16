@@ -3,7 +3,17 @@ const { model } = require('mongoose');
 const Questios = require('./modal/User');
 const Category = require('./modal/Category');
 const Route = express.Router()
-
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads/'); // Specify the folder where you want to store the uploaded images
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.mimetype.split('/')[1]);
+    }
+  });
+  const upload = multer({ storage: storage });
 
 Route.post("/Question", (req, res) => {
 
