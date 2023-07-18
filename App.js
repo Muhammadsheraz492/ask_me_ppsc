@@ -41,15 +41,16 @@ const { default: mongoose } = require("mongoose");
 require("dotenv").config();
 const morgan = require("morgan");
 const core = require("cors");
+const Paper = require("./modal/Paper");
 const app = express();
 app.use(bodyParser.json());
 app.use(core());
 
 app.use(express.json({ extended: false }));
-
 app.use(morgan("dev"));
 app.use("/Admin", Admin);
 app.use("/User", User);
+app.use("/Upload",express.static('uploads'))
 app.use("/CheckDataBase", (req, res) => {
   mongoose
     .connect(process.env.DB, {
@@ -64,10 +65,10 @@ app.use("/CheckDataBase", (req, res) => {
       res.status(200).json("Error connecting to MongoDB:", error);
     });
 });
-app.use("/", (req, res) => {
-  res.end(
-    "<!DOCTYPE html> <html><head> <title>Simple HTML Page</title></head><body>  <h1>Welcome to My Simple HTML Page</h1> <p>This is a basic HTML page created by ChatGPT.</p></body></html> "
-  );
-});
+// app.use("/", (req, res) => {
+//   res.end(
+//     "<!DOCTYPE html> <html><head> <title>Simple HTML Page</title></head><body>  <h1>Welcome to My Simple HTML Page</h1> <p>This is a basic HTML page created by ChatGPT.</p></body></html> "
+//   );
+// });
 
 module.exports = app;

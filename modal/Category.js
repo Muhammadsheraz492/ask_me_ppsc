@@ -6,6 +6,10 @@ const Questions = mongoose.Schema({
     Category_Name: {
       type: String,
       required: true,
+    },
+    Category_Image:{
+      type:String,
+      required:true
     }
  
   });

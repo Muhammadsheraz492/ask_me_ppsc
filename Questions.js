@@ -4,6 +4,7 @@ const Questios = require('./modal/User');
 const Category = require('./modal/Category');
 const Route = express.Router()
 const multer = require('multer');
+const Paper = require('./modal/Paper');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'uploads/'); // Specify the folder where you want to store the uploaded images
@@ -43,7 +44,7 @@ Route.get("/Question", (req, res) => {
         res.status(500).json(err)
     })
 })
-Route.post('/Category', (req, res) => {
+Route.post('/Category',upload.single("image"), (req, res) => {
     try {
         Category.find({ Category_Name: req.body.Category_Name })
             .then((doc) => {
@@ -57,6 +58,7 @@ Route.post('/Category', (req, res) => {
 
                     const category = new Category({
                         Category_Name: req.body.Category_Name,
+                        Category_Image:req.file.path
 
                     });
                     category
@@ -64,6 +66,7 @@ Route.post('/Category', (req, res) => {
                         .then(() => {
                             res.status(200).json({
                                 status: true,
+                                imagePath:req.file.path,
                                 message: "Category Added"
                             });
                         })
@@ -102,5 +105,34 @@ Route.get("/Category",(req,res)=>{
 
 
 
-
+Route.post("/past_paper",upload.single("pdf"), async (req, res) => {
+    try {
+      const { Category_Name, Paper_Pdf, Paper_year, Paper_Name } = req.body;
+      const pdfPath = req.file.filename;
+   
+      const paper = new Paper({
+        Category_Name,
+        Paper_Pdf:pdfPath,
+        Paper_year,
+        Paper_Name,
+      });
+  
+      const savedPaper = await paper.save();
+  
+      res.status(201).json(savedPaper);
+    } catch (error) {
+      console.error("Error creating paper:", error);
+      res.status(500).json({ error: "An error occurred while creating the paper" });
+    }
+  });
+  
+  Route.get("/past_paper", async (req, res) => {
+    try {
+      const papers = await Paper.find();
+      res.json(papers);
+    } catch (error) {
+      console.error("Error retrieving papers:", error);
+      res.status(500).json({ error: "An error occurred while retrieving papers" });
+    }
+  });
 module.exports = Route;
