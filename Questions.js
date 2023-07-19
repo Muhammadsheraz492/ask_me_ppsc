@@ -45,6 +45,8 @@ Route.get("/Question", (req, res) => {
     })
 })
 Route.post('/Category',upload.single("image"), (req, res) => {
+  // const pdfPath = req.file.filename;
+  console.log(req.file.path);
     try {
         Category.find({ Category_Name: req.body.Category_Name })
             .then((doc) => {
@@ -89,6 +91,7 @@ Route.post('/Category',upload.single("image"), (req, res) => {
     }
 })
 Route.get("/Category",(req,res)=>{
+  
   Category.find({}).then((doc)=>{
      res.status(200).json({
         "status":true,
