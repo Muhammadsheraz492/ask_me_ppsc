@@ -164,7 +164,7 @@ Route.post("/past_paper", upload.single("pdf"), async (req, res) => {
 
 Route.get("/past_paper", async (req, res) => {
   try {
-    const papers = await Paper.find();
+    const papers = await Paper.find({Category_Name:req.body.Category_Name});
     res.json(papers);
   } catch (error) {
     console.error("Error retrieving papers:", error);
