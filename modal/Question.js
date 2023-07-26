@@ -1,3 +1,6 @@
+
+const mongoose = require("mongoose");
+
 const Questions = mongoose.Schema({
   // _id: mongoose.Types.ObjectId,
   Question: {
@@ -12,5 +15,9 @@ const Questions = mongoose.Schema({
     type: Array,
     required: true,
   },
+  Category_Name: {
+    type: String,
+    required: true,
+  }
 });
 module.exports = mongoose.model("Questions", Questions);

@@ -1,6 +1,6 @@
 const express = require('express');
 const { model } = require('mongoose');
-const Questios = require('./modal/User');
+const Questios = require('./modal/Question');
 const Category = require('./modal/Category');
 const { initializeApp } = require('firebase/app')
 const { getStorage, ref, getDownloadURL, uploadBytesResumable } = require('firebase/storage');
@@ -19,23 +19,31 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 const storage = getStorage();
 const upload = multer();
-Route.post("/Question", (req, res) => {
+Route.post("/Question", async (req, res) => {
+  try {
+    const data = await Category.find({ Category_Name: req.query.Category_Name })
+    // console.log("Category :",data);
+    if (data.length >= 1) {
 
-  const Questions = new Questios(
-    {
-      Question: req.query.Question,
-      Options: req.query.Options,
-      Correct_Option: req.query.Correct_Option,
+
+      const Questions = new Questios(
+        {
+          Question: req.query.Question,
+          Options: req.query.Options,
+          Correct_Option: req.query.Correct_Option,
+          Category_Name: req.query.Category_Name
+        }
+      )
+      await Questions.save();
+      res.end("Okey Data Has Been Added")
     }
-  )
-  Questions.save().then(() => {
-    res.end("Okey Data Has Been Added")
+    else {
+      res.end("Category Not Founded")
+    }
+  } catch (error) {
 
-  }).catch((err) => {
-    console.log(err);
     res.end("Somthing Went Wrong")
-
-  })
+  }
 })
 
 
@@ -55,6 +63,7 @@ Route.post('/Category', upload.single("image"), async (req, res) => {
         status: false,
         message: "This Category Already Exist"
       });
+
     }
     const dateTime = giveCurrentDateTime();
     const storageRef = ref(storage, `files/${req.file.originalname + "       " + dateTime}`);
@@ -93,6 +102,36 @@ Route.get("/Category", (req, res) => {
     });
   })
 })
+Route.get("/Find_Question", async(req, res) => {
+  // Category.find({}).then((doc) => {
+  //   res.status(200).json({
+  //     "status": true,
+  //     data: doc
+
+  //   })
+  // }).catch((err) => {
+  //   res.status(200).json({
+  //     status: false,
+  //     message: err
+  //   });
+  // })
+  try {
+    const Data=await Questios.find({Category_Name:req.query.Category_Name})
+  return res.send({
+    status:true,
+    data:Data
+  })
+    
+  } catch (error) {
+    res.status(201).json({
+      status:false,
+      Error_message:error
+    })
+  }
+
+
+})
+
 
 
 
