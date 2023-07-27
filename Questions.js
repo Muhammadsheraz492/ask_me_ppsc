@@ -217,7 +217,12 @@ Route.get("/past_paper", async (req, res) => {
     res.status(500).json({ error: "An error occurred while retrieving papers" });
   }
 });
-
+Route.get("/get_mock_question",async(req,res)=>{
+  const Questions=await Questios.aggregate([
+  { $sample: { size: 1 } }
+]);
+res.json(Questions);
+})
 module.exports = Route;
 const giveCurrentDateTime = () => {
   const today = new Date();
