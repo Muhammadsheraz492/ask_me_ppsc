@@ -219,7 +219,7 @@ Route.get("/past_paper", async (req, res) => {
 });
 Route.get("/get_mock_question",async(req,res)=>{
   const Questions=await Questios.aggregate([
-  { $sample: { size: 1 } }
+  { $sample: { size: 2 } }
 ]);
 res.json(Questions);
 })
