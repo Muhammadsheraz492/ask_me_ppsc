@@ -7,6 +7,7 @@ const { getStorage, ref, getDownloadURL, uploadBytesResumable } = require('fireb
 const Route = express.Router()
 const multer = require('multer');
 const Paper = require('./modal/Paper');
+const Books = require('./modal/Books');
 const firebaseConfig = {
   apiKey: "AIzaSyACQGtdj4qFxD6QPiP0omlaOBkz7zTMJMI",
   authDomain: "ppsc-db25f.firebaseapp.com",
@@ -161,7 +162,51 @@ Route.post("/past_paper", upload.single("pdf"), async (req, res) => {
     res.status(500).json({ error: "An error occurred while creating the paper" });
   }
 });
+Route.post("/post_books",upload.fields([
+  {name:"book_url",maxCount:1},
+  {name:"book_image",maxCount:1},
+]),async(req,res)=>{
+  try {
+    const { Category_Name, Paper_Pdf, Paper_year, Paper_Name } = req.body;
+    const pdfPath = req.files.book_url[0].filename;
+    const BookIMageUrl = req.files.book_image[0].filename;
+    const dateTime = giveCurrentDateTime();
+    const storageRef = ref(storage, `Books/${req.files.book_url[0].originalname + "       " + dateTime}`);
+    const storageRef1 = ref(storage, `Books_Images/${req.files.book_image[0].originalname + "       " + dateTime}`);
+    const metadata = {
+      contentType: req.files.book_url[0].mimetype,
+    };
+     const book_metadata = {
+      contentType: req.files.book_image[0].mimetype,
+    };
+    const snapshot = await uploadBytesResumable(storageRef, req.files.book_url[0].buffer, metadata);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+        const snapshot_Image = await uploadBytesResumable(storageRef1, req.files.book_image[0].buffer, book_metadata);
+    const downloadURL_Image = await getDownloadURL(snapshot_Image.ref);
 
+     const Book=new Books({
+     BookName:req.body.BookName,
+     Book_Image:downloadURL_Image,
+     Book_url:downloadURL
+     })
+
+    const savedPaper = await Book.save();
+
+    res.status(201).json(savedPaper);
+  } catch (error) {
+    console.error("Error creating paper:", error);
+    res.status(500).json({ error: "An error occurred while creating the paper" });
+  }
+});
+Route.get("/get_books", async (req, res) => {
+  try {
+    const papers = await Books.find();
+    res.json(papers);
+  } catch (error) {
+    console.error("Error retrieving papers:", error);
+    res.status(500).json({ error: "An error occurred while retrieving Books" });
+  }
+});
 Route.get("/past_paper", async (req, res) => {
   console.log(req.query);
   try {
@@ -172,6 +217,7 @@ Route.get("/past_paper", async (req, res) => {
     res.status(500).json({ error: "An error occurred while retrieving papers" });
   }
 });
+
 module.exports = Route;
 const giveCurrentDateTime = () => {
   const today = new Date();
