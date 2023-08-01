@@ -10,30 +10,32 @@ function generateOTP() {
   const otp = Math.floor(Math.random() * 9000) + 1000;
   return otp.toString();
 }
-const SendEmail = (val, val1) => {
 
-  var transporter = nodemailer.createTransport({
+async function SendEmail(val, val1) {
+  const transporter = nodemailer.createTransport({
     service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
-      user: 'razakhan.yt0012@gmail.com',
-      pass: 'cvmzenrnkczdipxe'
-    }
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
   });
 
-  var mailOptions = {
-    from: 'razakhan.yt0012@gmail.com',
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
     to: val,
     subject: 'Sending Email using Node.js',
-    text: val1
+    text: val1,
   };
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
-  });
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.response);
+  } catch (error) {
+    throw error;
+  }
 }
 
 Customer.post("/Signup", (req, res) => {
@@ -105,30 +107,40 @@ Customer.post("/Login", (req, res) => {
 Customer.post("/reset_email", async (req, res) => {
   console.log(req.query);
   try {
-    let doc = await User.find({ email: req.query.email })
+    const doc = await User.find({ email: req.query.email });
     const otp = generateOTP();
-    if (doc.length >= 1) {
-      SendEmail(req.query.email, otp);
-      console.log(otp);
 
-      res.json({
-        status: true,
-        message: "Email  Founded",
-        otp: otp
-      })
+    if (doc.length >= 1) {
+      try {
+        await SendEmail(req.query.email, otp);
+        res.json({
+          status: true,
+          message: "Email Found",
+          otp: otp,
+        });
+      } catch (error) {
+        console.log('Email sending error:', error);
+        res.json({
+          status: false,
+          message: "Error sending email",
+        });
+      }
+      console.log('OTP:', otp);
     } else {
       res.json({
-        status: true,
+        status: false,
         message: "Email Not Found",
-        doc: doc
-      })
+      });
     }
-    res.json(doc)
   } catch (error) {
-    res.json(error)
+    console.log('Database error:', error);
+    res.json({
+      status: false,
+      message: "Database error",
+    });
   }
+});
 
-})
 
 
 Customer.post("/new_password",async(req,res)=>{
